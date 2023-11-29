@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import string
 import random
 
@@ -8,6 +9,7 @@ def generate_short_id():
     return ''.join(random.choice(characters) for _ in range(length))
 
 class ShortenedUrl(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shortened_urls')
     original_url = models.URLField()
     short_id = models.CharField(max_length=6, unique=True, default=generate_short_id)
     count = models.IntegerField(default=0)
