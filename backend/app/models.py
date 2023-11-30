@@ -12,7 +12,10 @@ class ShortenedUrl(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shortened_urls')
     original_url = models.URLField()
     short_id = models.CharField(max_length=6, unique=True, default=generate_short_id)
-    count = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.short_id}: {self.original_url}'
+
+class View(models.Model):
+    shortened_url = models.ForeignKey(ShortenedUrl, on_delete=models.CASCADE, related_name='views')
+    viewed_at = models.DateTimeField(auto_now_add=True)

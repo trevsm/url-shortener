@@ -1,13 +1,23 @@
 import { useState } from "react"
 import { useLogin } from "../api"
+import { useLocation, useNavigate } from "react-router-dom"
+import { DASHBOARD_URL } from "../../constants"
 
 function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
+  const location = useLocation()
+  const navigate = useNavigate()
+  const next = new URLSearchParams(location.search).get("next")
+
   const { handleLogin, loading, errors } = useLogin({
     onSuccess: () => {
-      window.location.href = "/dashboard"
+      if (next) {
+        navigate(next)
+      } else {
+        navigate(DASHBOARD_URL)
+      }
     },
     onError: (errors) => {
       //

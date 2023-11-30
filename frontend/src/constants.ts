@@ -1,6 +1,7 @@
 const BASE_API_URL = "http://localhost:8000/api"
 const CSRF_API = `${BASE_API_URL}/csrf/`
-const LIST_API = `${BASE_API_URL}/list`
+const LIST_API = `${BASE_API_URL}/urls/`
+const DETAILED_URL_API = `${BASE_API_URL}/url/`
 const SHORTEN_API = `${BASE_API_URL}/shorten/`
 const LOGIN_API = `${BASE_API_URL}/login/`
 const REGISTER_API = `${BASE_API_URL}/register/`
@@ -19,6 +20,7 @@ export {
   REGISTER_API,
   PROFILE_API,
   DASHBOARD_URL,
+  DETAILED_URL_API,
   LOGIN_URL,
   REGISTER_URL,
 }

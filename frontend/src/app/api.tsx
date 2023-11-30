@@ -8,6 +8,7 @@ import {
   LOGIN_API,
   REGISTER_API,
   PROFILE_API,
+  DETAILED_URL_API,
 } from "../constants"
 import { useEffect, useRef, useState } from "react"
 import { URLItem } from "./types"
@@ -275,6 +276,44 @@ const useGetUrls = () => {
   }
 }
 
+const useUrlDetails = (props?: {
+  onSuccess?: () => void
+  onError?: (errors: string[]) => void
+}) => {
+  const onSuccess = props?.onSuccess || (() => {})
+  const onError = props?.onError || (() => {})
+
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
+  const [url, setUrl] = useState<URLItem>()
+
+  const handleGetUrlDetails = async (short: string) => {
+    setLoading(true)
+    setErrors([])
+    try {
+      const res = await axios.get(`${DETAILED_URL_API}${short}/`, {
+        headers: {
+          Authorization: `Token ${getToken()}`,
+        },
+      })
+      setUrl(res.data)
+      onSuccess()
+    } catch (err) {
+      setErrors((prev) => [...prev, "Error getting url details"])
+      onError(["Error getting url details"])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return {
+    handleGetUrlDetails,
+    loading,
+    errors,
+    url,
+  }
+}
+
 export {
   useCsrf,
   useCurrentUser,
@@ -283,4 +322,5 @@ export {
   useLogout,
   useShortenUrl,
   useGetUrls,
+  useUrlDetails,
 }

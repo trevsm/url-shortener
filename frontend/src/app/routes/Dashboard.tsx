@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useGetUrls, useShortenUrl } from "../api"
+import { DASHBOARD_URL } from "../../constants"
+import { Link } from "react-router-dom"
 
 function Dashboard() {
   const [url, setUrl] = useState("")
@@ -70,12 +72,9 @@ function Dashboard() {
               <tr key={index}>
                 <td>{originalUrl}</td>
                 <td>
-                  <a
-                    href={"http://localhost:8000/s/" + item.short_id}
-                    target="new"
-                  >
+                  <Link to={DASHBOARD_URL + "/" + item.short_id}>
                     {item.short_id}
-                  </a>
+                  </Link>
                 </td>
                 <td>{item.count}</td>
               </tr>
