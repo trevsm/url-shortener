@@ -22,7 +22,7 @@ def shorten_url(request):
 @permission_classes([IsAuthenticated])
 def list_urls(request):
     urls = request.user.shortened_urls.all()
-    return JsonResponse({'urls': list(urls.values('original_url', 'short_id', 'count'))})
+    return JsonResponse({'urls': list(urls.values('id', 'original_url', 'short_id', 'count'))})
 
 @api_view(['GET'])
 def redirect_url(request, short_id):
