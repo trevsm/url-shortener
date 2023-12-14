@@ -1,4 +1,6 @@
 const BASE_API_URL = "http://localhost:8000/api"
+const BASE_REDIRECT_URL = "http://localhost:8000/s"
+
 const CSRF_API = `${BASE_API_URL}/csrf/`
 const LIST_API = `${BASE_API_URL}/urls/`
 const DETAILED_URL_API = `${BASE_API_URL}/url/`
@@ -13,6 +15,7 @@ const REGISTER_URL = "/register"
 
 export {
   BASE_API_URL,
+  BASE_REDIRECT_URL,
   CSRF_API,
   LIST_API,
   SHORTEN_API,

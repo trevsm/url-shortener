@@ -216,13 +216,19 @@ const useShortenUrl = (props?: {
   const [errors, setErrors] = useState<string[]>([])
   const { csrf, loading: csrfLoading, errors: csrfErrors } = useCsrf()
 
-  const handleShortenUrl = async (url: string) => {
+  const handleShortenUrl = async ({
+    url,
+    title,
+  }: {
+    url: string
+    title?: string
+  }) => {
     setLoading(true)
     setErrors([])
     try {
       await axios.post(
         SHORTEN_API,
-        { url },
+        { url, title },
         {
           headers: {
             Authorization: `Token ${getToken()}`,
@@ -277,7 +283,7 @@ const useGetUrls = () => {
 }
 
 const useUrlDetails = (props?: {
-  onSuccess?: () => void
+  onSuccess?: (url: URLItem) => void
   onError?: (errors: string[]) => void
 }) => {
   const onSuccess = props?.onSuccess || (() => {})
@@ -297,7 +303,7 @@ const useUrlDetails = (props?: {
         },
       })
       setUrl(res.data)
-      onSuccess()
+      onSuccess(res.data)
     } catch (err) {
       setErrors((prev) => [...prev, "Error getting url details"])
       onError(["Error getting url details"])

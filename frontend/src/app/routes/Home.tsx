@@ -1,8 +1,10 @@
+import { Container } from "@mui/material"
+
 function Home() {
   return (
-    <div>
+    <Container maxWidth="md">
       <h1>Home</h1>
-    </div>
+    </Container>
   )
 }
 

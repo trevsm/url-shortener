@@ -10,6 +10,7 @@ def generate_short_id():
 
 class ShortenedUrl(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shortened_urls')
+    title = models.CharField(max_length=255, blank=True, null=True)
     original_url = models.URLField()
     short_id = models.CharField(max_length=6, unique=True, default=generate_short_id)
 
@@ -19,3 +20,4 @@ class ShortenedUrl(models.Model):
 class View(models.Model):
     shortened_url = models.ForeignKey(ShortenedUrl, on_delete=models.CASCADE, related_name='views')
     viewed_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField()

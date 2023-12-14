@@ -14,8 +14,12 @@ import json
 def shorten_url(request):
     data = json.loads(request.body)
     original_url = data.get('url', '')
+    title = data.get('title', '')
 
-    ShortenedUrl.objects.create(original_url=original_url, user=request.user)
+    if original_url == '':
+        return JsonResponse({"error":"URL is required"}, status=400)
+
+    ShortenedUrl.objects.create(original_url=original_url, user=request.user, title=title)
     return JsonResponse({"message":"success"})
 
 @api_view(['GET'])
@@ -27,6 +31,7 @@ def list_urls(request):
     for url in urls:
         urls_data.append({
             'id': url.id,
+            'title': url.title,
             'original_url': url.original_url,
             'short_id': url.short_id,
             'count': url.views.count()
@@ -42,11 +47,13 @@ def detailed_url_view(request, short_id):
 
         views = shortened_url.views.all().values(
             'id',
-            'viewed_at'
+            'viewed_at',
+            'ip_address'
         )
 
         return JsonResponse({
             'id': shortened_url.id,
+            'title': shortened_url.title,
             'original_url': shortened_url.original_url,
             'short_id': shortened_url.short_id,
             'views': list(views)
@@ -59,7 +66,7 @@ def detailed_url_view(request, short_id):
 def redirect_url(request, short_id):
     try:
         shortened_url = get_object_or_404(ShortenedUrl, short_id=short_id)
-        View.objects.create(shortened_url=shortened_url, viewed_at=timezone.now())
+        View.objects.create(shortened_url=shortened_url, viewed_at=timezone.now(), ip_address=request.META.get('REMOTE_ADDR'))
         return redirect(shortened_url.original_url)
     except ShortenedUrl.DoesNotExist:
         raise Http404('URL not found')
