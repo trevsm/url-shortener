@@ -9,6 +9,8 @@ import {
   REGISTER_API,
   PROFILE_API,
   DETAILED_URL_API,
+  UPDATE_API,
+  DELETE_API,
 } from "../constants"
 import { useEffect, useRef, useState } from "react"
 import { URLItem } from "./types"
@@ -252,6 +254,92 @@ const useShortenUrl = (props?: {
   }
 }
 
+const useUpdateUrl = (props?: {
+  onSuccess?: (url: URLItem) => void
+  onError?: (errors: string[]) => void
+}) => {
+  const onSuccess = props?.onSuccess || (() => {})
+  const onError = props?.onError || (() => {})
+
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
+  const { csrf, loading: csrfLoading, errors: csrfErrors } = useCsrf()
+
+  const handleUpdateUrl = async ({
+    shortId,
+    original_url,
+    title,
+  }: {
+    shortId: string
+    original_url?: string
+    title?: string
+  }) => {
+    setLoading(true)
+    setErrors([])
+    try {
+      const res = await axios.patch(
+        UPDATE_API(shortId),
+        { original_url, title },
+        {
+          headers: {
+            Authorization: `Token ${getToken()}`,
+            "X-CSRFToken": csrf,
+          },
+        }
+      )
+      onSuccess(res.data)
+    } catch (err) {
+      setErrors((prev) => [...prev, "Error updating url"])
+      onError(["Error updating url"])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return {
+    handleUpdateUrl,
+    loading: loading || csrfLoading,
+    errors: [...errors, ...csrfErrors],
+  }
+}
+
+const useDeleteUrl = (props?: {
+  onSuccess?: () => void
+  onError?: (errors: string[]) => void
+}) => {
+  const onSuccess = props?.onSuccess || (() => {})
+  const onError = props?.onError || (() => {})
+
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
+  const { csrf, loading: csrfLoading, errors: csrfErrors } = useCsrf()
+
+  const handleDeleteUrl = async (shortId: string) => {
+    setLoading(true)
+    setErrors([])
+    try {
+      await axios.delete(DELETE_API(shortId), {
+        headers: {
+          Authorization: `Token ${getToken()}`,
+          "X-CSRFToken": csrf,
+        },
+      })
+      onSuccess()
+    } catch (err) {
+      setErrors((prev) => [...prev, "Error deleting url"])
+      onError(["Error deleting url"])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return {
+    handleDeleteUrl,
+    loading: loading || csrfLoading,
+    errors: [...errors, ...csrfErrors],
+  }
+}
+
 const useGetUrls = () => {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
@@ -291,7 +379,7 @@ const useUrlDetails = (props?: {
 
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [url, setUrl] = useState<URLItem>()
+  const [urlData, setUrlData] = useState<URLItem>()
 
   const handleGetUrlDetails = async (short: string) => {
     setLoading(true)
@@ -302,7 +390,7 @@ const useUrlDetails = (props?: {
           Authorization: `Token ${getToken()}`,
         },
       })
-      setUrl(res.data)
+      setUrlData(res.data)
       onSuccess(res.data)
     } catch (err) {
       setErrors((prev) => [...prev, "Error getting url details"])
@@ -316,7 +404,7 @@ const useUrlDetails = (props?: {
     handleGetUrlDetails,
     loading,
     errors,
-    url,
+    urlData,
   }
 }
 
@@ -327,6 +415,8 @@ export {
   useLogin,
   useLogout,
   useShortenUrl,
+  useUpdateUrl,
+  useDeleteUrl,
   useGetUrls,
   useUrlDetails,
 }

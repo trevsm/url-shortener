@@ -5,6 +5,8 @@ const CSRF_API = `${BASE_API_URL}/csrf/`
 const LIST_API = `${BASE_API_URL}/urls/`
 const DETAILED_URL_API = `${BASE_API_URL}/url/`
 const SHORTEN_API = `${BASE_API_URL}/shorten/`
+const UPDATE_API = (id: string) => `${BASE_API_URL}/url/${id}/update/`
+const DELETE_API = (id: string) => `${BASE_API_URL}/url/${id}/delete/`
 const LOGIN_API = `${BASE_API_URL}/login/`
 const REGISTER_API = `${BASE_API_URL}/register/`
 const PROFILE_API = `${BASE_API_URL}/profile/`
@@ -19,6 +21,8 @@ export {
   CSRF_API,
   LIST_API,
   SHORTEN_API,
+  UPDATE_API,
+  DELETE_API,
   LOGIN_API,
   REGISTER_API,
   PROFILE_API,

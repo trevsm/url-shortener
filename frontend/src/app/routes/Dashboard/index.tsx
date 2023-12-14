@@ -1,11 +1,20 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useGetUrls } from "../../api"
-import { Box, Container, Skeleton, Stack, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  Container,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material"
 import { DashboardCard } from "./DashboardCard"
 import { NewUrlForm } from "./NewUrlForm"
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 
 function Dashboard() {
   const { handleGetUrls, loading, errors, urlList } = useGetUrls()
+  const [activeAdd, setActiveAdd] = useState(false)
 
   const sortedUrlList = urlList.sort((a, b) => b.id - a.id)
 
@@ -21,43 +30,63 @@ function Dashboard() {
     <Container
       maxWidth="md"
       sx={{
-        pt: 2,
+        pt: 4,
+        pb: 6,
       }}
     >
-      <Typography variant="h4" component="h1">
+      <Box height={20}>{loading && <LinearProgress />}</Box>
+      <Typography variant="h4" component="h1" gutterBottom>
         Dashboard
       </Typography>
 
-      <Box borderBottom="1px solid" my={4} />
-
-      <Typography variant="h6" component="h2" gutterBottom>
-        Add a new URL
-      </Typography>
-      <Box mb={2}>
-        <NewUrlForm callback={handleGetUrls} />
-      </Box>
-
-      <Box borderBottom="1px solid" my={5} />
-
       <Stack spacing={2}>
-        {loading ? (
-          Array.from({ length: 2 }, (_, i) => (
-            <Skeleton
-              key={i}
-              variant="rectangular"
-              height={180}
-              sx={{
-                borderRadius: "5px",
+        {activeAdd ? (
+          <Box
+            sx={{
+              border: "1px solid #e0e0e0",
+              borderRadius: "5px",
+              minHeight: 80,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <NewUrlForm
+              successCallback={() => {
+                setActiveAdd(false)
+                handleGetUrls()
               }}
+              handleCancel={() => setActiveAdd(false)}
             />
-          ))
-        ) : errors.length ? (
+          </Box>
+        ) : (
+          <Button
+            variant="outlined"
+            onClick={() => setActiveAdd(true)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              verticalAlign: "middle",
+              justifyContent: "center",
+              gap: 1,
+              minHeight: 80,
+            }}
+          >
+            <AddCircleOutlineIcon />
+            <Typography variant="body1">Add a new URL</Typography>
+          </Button>
+        )}
+        {errors.length ? (
           <Typography variant="h6" component="h2">
             Unable to fetch data...
           </Typography>
         ) : (
           sortedUrlList.map((url) => (
-            <DashboardCard urlItem={url} key={url.short_id} />
+            <DashboardCard
+              urlItem={url}
+              key={url.short_id}
+              successCallback={handleGetUrls}
+            />
           ))
         )}
       </Stack>

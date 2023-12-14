@@ -16,11 +16,61 @@ def shorten_url(request):
     original_url = data.get('url', '')
     title = data.get('title', '')
 
+    if not original_url.startswith('http://') and not original_url.startswith('https://'):
+        return JsonResponse({"error":"URL is invalid"}, status=400)
+
     if original_url == '':
         return JsonResponse({"error":"URL is required"}, status=400)
 
     ShortenedUrl.objects.create(original_url=original_url, user=request.user, title=title)
     return JsonResponse({"message":"success"})
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def update_url(request, short_id):
+    try:
+        shortened_url = ShortenedUrl.objects.get(short_id=short_id, user=request.user)
+    except ShortenedUrl.DoesNotExist:
+        return JsonResponse({'error': 'URL not found'}, status=404)
+
+    data = json.loads(request.body)
+    title = data.get('title')
+    original_url = data.get('original_url')
+
+    if original_url and not (original_url.startswith('http://') or original_url.startswith('https://')):
+        return JsonResponse({"error": "URL is invalid"}, status=400)
+
+    updated = False
+    if title is not None:
+        shortened_url.title = title
+        updated = True
+
+    if original_url:
+        shortened_url.original_url = original_url
+        updated = True
+
+    if updated:
+        shortened_url.save()
+        return JsonResponse({
+            'id': shortened_url.id,
+            'title': shortened_url.title,
+            'original_url': shortened_url.original_url,
+            'short_id': shortened_url.short_id
+        })
+    else:
+        return JsonResponse({'error': 'No updates provided'}, status=400)
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_url(request, short_id):
+    try:
+        shortened_url = ShortenedUrl.objects.get(short_id=short_id, user=request.user)
+        shortened_url.delete()
+        return JsonResponse({'message': 'success'})
+    except ShortenedUrl.DoesNotExist:
+        return JsonResponse({'error': 'URL not found'}, status=404)
 
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
@@ -60,7 +110,6 @@ def detailed_url_view(request, short_id):
         })
     except ShortenedUrl.DoesNotExist:
         return JsonResponse({'error': 'URL not found'}, status=404)
-
 
 @api_view(['GET'])
 def redirect_url(request, short_id):

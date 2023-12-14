@@ -10,3 +10,9 @@ export interface URLItem {
   }[]
   count?: number
 }
+
+export interface ViewItem {
+  id: number
+  viewed_at: string
+  ip_address: string
+}

@@ -2,6 +2,7 @@ import { BASE_REDIRECT_URL, DASHBOARD_URL } from "../../../constants"
 import { Link } from "react-router-dom"
 import {
   Box,
+  Button,
   Paper,
   Stack,
   Table,
@@ -15,18 +16,36 @@ import {
 } from "@mui/material"
 import { URLItem } from "../../types"
 import { useSnackbar } from "notistack"
+import { useDeleteUrl } from "../../api"
 
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
+import DeleteIcon from "@mui/icons-material/Delete"
 
-export function DashboardCard({ urlItem }: { urlItem: URLItem }) {
+export function DashboardCard({
+  urlItem,
+  successCallback,
+}: {
+  urlItem: URLItem
+  successCallback: () => void
+}) {
   if (!urlItem.original_url || !urlItem.short_id) return <></>
 
   const { enqueueSnackbar } = useSnackbar()
 
+  const { handleDeleteUrl, loading: deleteUrlLoading } = useDeleteUrl({
+    onSuccess: () => {
+      enqueueSnackbar("Deleted!", { variant: "success" })
+      successCallback()
+    },
+    onError: (errors) => {
+      errors.forEach((err) => enqueueSnackbar(err, { variant: "error" }))
+    },
+  })
+
   const title = urlItem.title
     ? urlItem.title
-    : new URL(urlItem.original_url).hostname + " Untitled"
+    : "Untitled " + new URL(urlItem.original_url).hostname
   const shortUrl = `${BASE_REDIRECT_URL}/${urlItem.short_id}`
   const originalUrl =
     urlItem.original_url.substring(0, 50) === urlItem.original_url
@@ -51,6 +70,8 @@ export function DashboardCard({ urlItem }: { urlItem: URLItem }) {
           py={1}
           borderBottom="1px solid #e0e0e0"
           bgcolor="whitesmoke"
+          display="flex"
+          justifyContent="space-between"
         >
           <Link to={`${DASHBOARD_URL}/${urlItem.short_id}`}>
             <Tooltip title="More details">
@@ -59,6 +80,16 @@ export function DashboardCard({ urlItem }: { urlItem: URLItem }) {
               </Typography>
             </Tooltip>
           </Link>
+          <Tooltip title="Delete">
+            <Button
+              color="error"
+              sx={{ cursor: "pointer" }}
+              onClick={() => handleDeleteUrl(urlItem.short_id)}
+              disabled={deleteUrlLoading}
+            >
+              <DeleteIcon fontSize="small" /> Delete
+            </Button>
+          </Tooltip>
         </Box>
         <TableContainer>
           <Table>

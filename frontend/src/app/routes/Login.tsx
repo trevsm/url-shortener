@@ -17,7 +17,7 @@ function Login() {
 
   const { enqueueSnackbar } = useSnackbar()
 
-  const { handleLogin, loading, errors } = useLogin({
+  const { handleLogin, loading } = useLogin({
     onSuccess: () => {
       if (next) {
         navigate(next)
