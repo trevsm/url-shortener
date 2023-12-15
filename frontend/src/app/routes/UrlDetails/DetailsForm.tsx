@@ -1,5 +1,5 @@
 import { Box, Button, Stack, TextField } from "@mui/material"
-import { BASE_REDIRECT_URL } from "../../../constants"
+import { REDIRECT_URL } from "../../../constants"
 import { useSnackbar } from "notistack"
 import { URLItem } from "../../types"
 import { EditableUrlItem } from "."
@@ -35,7 +35,7 @@ export function DetailsForm({
     },
   })
 
-  const shortUrl = `${BASE_REDIRECT_URL}/${urlData?.short_id}`
+  const shortUrl = `${REDIRECT_URL}/${urlData?.short_id}`
 
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(shortUrl)

@@ -1,4 +1,4 @@
-import { BASE_REDIRECT_URL, DASHBOARD_URL } from "../../../constants"
+import { REDIRECT_URL, DASHBOARD_URL } from "../../../constants"
 import { Link } from "react-router-dom"
 import {
   Box,
@@ -46,7 +46,7 @@ export function DashboardCard({
   const title = urlItem.title
     ? urlItem.title
     : "Untitled " + new URL(urlItem.original_url).hostname
-  const shortUrl = `${BASE_REDIRECT_URL}/${urlItem.short_id}`
+  const shortUrl = `${REDIRECT_URL}/${urlItem.short_id}`
   const originalUrl =
     urlItem.original_url.substring(0, 50) === urlItem.original_url
       ? urlItem.original_url
