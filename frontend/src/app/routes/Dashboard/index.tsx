@@ -1,16 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { useGetUrls } from "../../api"
-import {
-  Box,
-  Button,
-  Container,
-  LinearProgress,
-  Stack,
-  Typography,
-} from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import { DashboardCard } from "./DashboardCard"
 import { NewUrlForm } from "./NewUrlForm"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import Page from "../../Page"
 
 function Dashboard() {
   const { handleGetUrls, loading, errors, urlList } = useGetUrls()
@@ -27,18 +21,7 @@ function Dashboard() {
   }, [])
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{
-        pt: 4,
-        pb: 6,
-      }}
-    >
-      <Box height={20}>{loading && <LinearProgress />}</Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Dashboard
-      </Typography>
-
+    <Page title="Dashboard" loading={loading}>
       <Stack spacing={2}>
         {activeAdd ? (
           <Box
@@ -90,7 +73,7 @@ function Dashboard() {
           ))
         )}
       </Stack>
-    </Container>
+    </Page>
   )
 }
 export default Dashboard

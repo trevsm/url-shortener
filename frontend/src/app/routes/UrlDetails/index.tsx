@@ -1,10 +1,24 @@
-import { Link, useParams } from "react-router-dom"
-import { useUrlDetails } from "../../api"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { useDeleteUrl, useUrlDetails } from "../../api"
 import { useEffect, useRef, useState } from "react"
-import { Button, Container, Paper, Stack, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material"
 import { DASHBOARD_URL } from "../../../constants"
 import { DetailsForm } from "./DetailsForm"
-import { ViewCard } from "./ViewCard"
+import { ViewRow } from "./ViewRow"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import { useSnackbar } from "notistack"
+import Page from "../../Page"
 
 export interface EditableUrlItem {
   title?: string
@@ -13,9 +27,23 @@ export interface EditableUrlItem {
 
 function UrlDetails() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [formData, setFormData] = useState<EditableUrlItem>({
     title: "",
     original_url: "",
+  })
+  const { handleDeleteUrl } = useDeleteUrl({
+    onSuccess: () => {
+      enqueueSnackbar("URL deleted", { variant: "success" })
+      setTimeout(() => {
+        navigate(DASHBOARD_URL)
+      }, 1000)
+    },
+    onError: (errors) => {
+      errors.forEach((err) => enqueueSnackbar(err, { variant: "error" }))
+    },
   })
 
   const { handleGetUrlDetails, loading, urlData } = useUrlDetails({
@@ -42,20 +70,14 @@ function UrlDetails() {
   if (!id) return
 
   return (
-    <Container
-      maxWidth="xs"
-      sx={{
-        pt: 2,
-      }}
-    >
+    <Page title="Details" loading={loading}>
       <Link to={DASHBOARD_URL}>
         <Button variant="contained" color="primary">
-          Back
+          <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
+          Dashboard
         </Button>
       </Link>
-      <Typography variant="h6" sx={{ my: 2 }} component="h1">
-        Details
-      </Typography>
+      <Box height={20} />
       <DetailsForm
         urlData={urlData}
         formData={formData}
@@ -63,27 +85,59 @@ function UrlDetails() {
         successCallback={() => handleGetUrlDetails(id)}
         loading={loading}
       />
+      <Button
+        variant="contained"
+        color="error"
+        sx={{ mt: 2 }}
+        onClick={() => handleDeleteUrl(id)}
+      >
+        Delete URL
+      </Button>
+      <Box height={20} />
       <Typography variant="h6" sx={{ mt: 2 }} component="h2">
         Clicks: ({urlData?.views?.length})
       </Typography>
       <Paper>
-        <Stack borderRadius={1} sx={{ mt: 2 }} maxHeight={200} overflow="auto">
-          {sortedViews?.length === 0 ? (
-            <Typography variant="body2" p={2}>
-              No clicks yet
-            </Typography>
-          ) : (
-            sortedViews?.map((visit, index) => (
-              <ViewCard
-                key={visit.id}
-                visit={visit}
-                isLast={index === sortedViews.length - 1}
-              />
-            ))
-          )}
-        </Stack>
+        <TableContainer
+          component={Paper}
+          sx={{
+            mt: 2,
+            maxHeight: 200,
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead
+              sx={{
+                "& th": {
+                  backgroundColor: "whitesmoke",
+                },
+              }}
+            >
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Time</TableCell>
+                <TableCell>IP Address</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedViews?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Typography variant="body2" p={2}>
+                      No clicks yet
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedViews?.map((visit) => (
+                  <ViewRow key={visit.id} visit={visit} />
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
-    </Container>
+    </Page>
   )
 }
 
