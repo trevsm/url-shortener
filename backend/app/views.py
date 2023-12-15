@@ -16,6 +16,9 @@ def shorten_url(request):
     original_url = data.get('url', '')
     title = data.get('title', '')
 
+    if request.user.shortened_urls.count() >= 20:
+        return JsonResponse({"error":"Maximum number of URLs reached (20)"}, status=400)
+
     if not original_url.startswith('http://') and not original_url.startswith('https://'):
         return JsonResponse({"error":"URL is invalid"}, status=400)
 
