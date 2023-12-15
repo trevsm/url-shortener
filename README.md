@@ -50,3 +50,12 @@ npm start
 # In backend
 python manage.py runserver
 ```
+
+### Screenshots
+
+![Screenshot from 2023-12-14 18-19-14](https://github.com/trevsm/url-shortener/assets/28761454/5d2891e0-b656-4120-afd2-63d49861039c)
+
+![Screenshot from 2023-12-14 18-18-44](https://github.com/trevsm/url-shortener/assets/28761454/9234fe68-3e36-4044-b7cb-9b1ae380f7c2)
+
+![Screenshot from 2023-12-14 18-19-02](https://github.com/trevsm/url-shortener/assets/28761454/22486306-89fc-45a1-bd60-1f9d0fbf91d5)
+
